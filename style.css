@@ -1,0 +1,371 @@
+* {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    margin: 0;
+    font-family: 'Roboto', Arial, sans-serif;
+    background: linear-gradient(to bottom, #87CEEB, #E0F7FA);
+    color: #333;
+    position: relative;
+}
+
+/* Game Container */
+#game-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Grass Floor */
+#grass-floor {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px; /* Adjust height as needed */
+    background: linear-gradient(to top, #76c7c0, #4caf50);
+    border-top: 5px solid #3e8e41; /* Add a darker border for depth */
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* HP Container */
+#hp-container  {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    width: 223px;
+    height: 223px;
+    border-radius: 15px;
+    overflow: hidden;
+    image-rendering: pixelated;
+    z-index: 10;
+}
+#hp-bar-bg {
+    width: 100%;
+    height: 100%;
+    background-image: url('images/Utilites/BoomGooHPBar.png');
+    background-size: 100% 100%;
+    position: relative;
+    z-index: 10;
+}
+
+#hp-text {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+#hp-container2 {
+    position: fixed;
+    top: 90px;
+    left: 30px;
+}
+
+#hp-bar2 {
+    width: 180px;
+    height: 30px;
+    background: gray;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+#hp-fill {
+    height: 100%;
+    background: red; /* Color for the current HP */
+    border-radius: 15px 0 0 15px; /* To keep corners rounded */
+    transition: width 0.2s ease; /* Smooth transition when updating HP */
+}
+
+
+/* Game Canvas */
+#game-canvas {
+    width: 100%;
+    height: calc(100% - 100px); /* Adjust to account for the grass floor */
+}
+
+/* Blue Slime */
+.blue-slime {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle at 30% 30%, #6495ED, #4169E1);
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.blue-slime:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Death Message */
+#death {
+    display: none; /* You can control this through JavaScript */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    font-weight: bold;
+    color: #FF4136;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.1); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+
+
+/* Background Texture */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/png;base64,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');
+    opacity: 0.05;
+    z-index: -1;
+    pointer-events: none;
+}
+
+
+#skill-tree-ui {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    scale: 1.1;
+    z-index: 2000;
+}
+
+.skill-button {
+    margin: 5px;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.skill-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+#xp-container {
+    position: fixed;
+    top: 120px;
+    left: 10px;
+    width: 223px;
+    height: 223px;
+    border-radius: 15px;
+    overflow: hidden;
+    image-rendering: pixelated;
+    
+}
+
+#xp-bar-bg {
+    width: 100%;
+    height: 100%;
+    background-image: url('images/Utilites/BoomGooXPBar.png');
+    background-size: 100% 100%;
+    position: relative;
+}
+
+
+#xp-bar {
+    width: 100%;
+    height: 100%;
+    background-color: #4CAF50;
+    transition: width 0.3s ease-in-out;
+}
+
+#xp-bar-fill {
+    width: 0%;
+    height: 100%;
+    background-color: #8BC34A;
+    transition: width 0.3s ease-in-out;
+}
+
+#xp-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+#xp2-container  {
+    position: fixed;
+    top: 200px;
+    left: 30px;
+    width: 190px;
+    height: 30px;
+    background: gray;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    
+}
+
+#xp2-bar {
+    width: 0%; /* Start from 0% width */
+    height: 100%;
+    background-color: green;
+    transition: width 0.3s ease-out; /* Smooth transition */
+    z-index: 2;
+}
+
+#inventory-ui {
+    display: flex; /* Use flexbox for centering */
+    flex-direction: column; /* Stack items vertically */
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+    position: fixed; /* Fixed position */
+    top: 50%; /* Move down 50% from the top */
+    left: 50%; /* Move right 50% from the left */
+    transform: translate(-50%, -50%); /* Adjust for centering */
+    background: rgba(255, 255, 255, 0.5 ); /* Slightly more opaque */
+    background-image: url(/images/Utilites/BackgroundBoom.png);
+    
+    image-rendering: pixelated;
+    background-size: 300px;
+    background-repeat: no-repeat;
+    border: 2px solid #000; /* Border for distinction */
+    padding: 20px; /* Padding inside the box */
+    z-index: 1000; /* Ensure it stays above other elements */
+    width: 250px; /* Fixed width */
+    max-height: 400px; /* Limit height */
+    overflow-y: auto; /* Enable scrolling for overflow */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Shadow for depth */
+    text-align: center;
+}
+
+#inventory-list {
+    list-style-type: none; /* Remove bullet points */
+    padding: 40px; /* Remove padding */
+    padding-top: 70px;
+    margin: 0; /* Remove margin */
+}
+
+#inventory-list li {
+    display: flex; /* Allows for flexible positioning */
+    align-items: center; /* Vertically center-aligns items */
+    margin-bottom: 10px; /* Space between list items */
+    padding: 5px 10px; /* Add padding for better spacing */
+    transition: background-color 0.3s ease; /* Smooth transition */
+    font-family: Arial, sans-serif; /* Font styling */
+    font-size: 14px; /* Text size */
+    color: #333; /* Text color */
+}
+
+.item-image {
+    width: 32px; /* Adjust the width as needed */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 10px; /* Space between image and text */
+    image-rendering: pixelated; /* Make pixel art look sharper */
+}
+
+#inventory-list li:hover {
+    background-color: #f0f0f0; /* Highlight on hover */
+}
+
+/* #xp2-text {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+} */
+
+
+#crafting-ui {
+    z-index: 10;
+}
+
+
+
+#StartingMenu {
+   text-align: center;
+}
+
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #b2cce5, #82aaff);
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.menu-container {
+    background: rgba(125, 117, 117, 0.4);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.game-title {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+.menu-button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    font-size: 1.2em;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px 0;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.menu-button:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+.menu-button:active {
+    transform: translateY(1px);
+}
+
+.menu-description {
+    margin-top: 20px;
+    font-size: 1.2em;
+    color: #555;
+}
+
+

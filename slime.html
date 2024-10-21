@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Slime Adventure</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="start-menu" class="menu-container">
+        <!-- <img src="images/your-image.png" alt="Game Logo" class="game-logo"> -->
+        <h1 class="game-title">Blue Slime Adventure</h1>
+        <button class="menu-button" id="start-game">Start Game</button>
+        <button class="menu-button" id="options">Options</button>
+        <button class="menu-button" id="exit">Exit</button>
+        <!-- <button class="menu-button" id="load-button">Load Game</button> -->
+        <p class="menu-description">Embark on a journey as a brave slime!</p>
+    </div>
+
+    
+
+    <div id="skill-tree-ui" style="display: none;">
+        <div id="skill-tree-level"></div>
+        <div id="skill-tree-exp"></div>
+        <div id="skill-tree-points"></div>
+        <div id="skill-list"></div>
+        <button id="prev-page" style="display: none;">Previous</button>
+        <button id="next-page" style="display: none;">Next</button>
+    </div>
+
+    <h2 id="death" style="display: none;">Game Over</h2>
+    <div id="game-container" style="display: none;">
+        <div id="grass-floor"></div>
+        <canvas id="game-canvas"></canvas>
+
+        <div id="inventory-ui" style="display: none;">
+            <h2>Inventory</h2>
+            <ul id="inventory-list"></ul>
+            <div id="pagination-controls"></div>
+        </div>
+
+        <div id="crafting-ui" class="crafting-ui">
+            <h2>Crafting Menu</h2>
+            <button id="open-crafting-grid">Open Crafting Grid</button>
+        </div>
+
+        <div id="hp-container">
+            <div id="hp-bar-bg"></div>
+        </div>
+
+        <div id="hp-container2">
+            <div id="hp-bar2">
+                <div id="hp-fill"></div>
+            </div>
+        </div>
+
+        <div id="xp-container" style="z-index: 10;">
+            <div id="xp-bar-bg"></div>
+        </div>
+        <div id="xp2-container">
+            <div id="xp2-bar">
+                <span id="xp2-text"></span>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="Scripts/game.js"></script>
+    <script>
+        document.getElementById('start-game').addEventListener('click', function() {
+            document.getElementById('start-menu').style.display = 'none';
+            document.getElementById('game-container').style.display = 'block';
+            // Initialize your game here
+        });
+
+        document.getElementById('options').addEventListener('click', function() {
+            alert('Options menu not implemented yet.');
+        });
+
+        document.getElementById('exit').addEventListener('click', function() {
+            window.close(); // Close the window/tab
+        });
+    </script>
+</body>
+</html>

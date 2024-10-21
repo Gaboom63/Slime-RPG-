@@ -1,0 +1,2 @@
+Code To Remember: 
+        ctx.imageSmoothingEnabled = false
