@@ -1,7 +1,9 @@
+import {slime, stopTheControl} from './game.js';
 // Skill Tree System
-let currentLevel = 1;
+let currentLevel =  1;
 let currentXP = 0;
 let xpToNextLevel = 100;
+let canFluderJump = false;
 
 export const skillTree = {
     level: currentLevel,
@@ -13,6 +15,12 @@ export const skillTree = {
             cost: 1,
             displayName: "Double Jump", // Add display name
             description: "Allows the slime to jump twice"
+        },
+        fluderJump: {
+            unlocked: false,
+            cost: 1,
+            displayName: "Fludder Jump", // Add display name
+            description: "Fly... For like a second"
         },
         fireballShot: {
             unlocked: false,
@@ -179,7 +187,14 @@ const prevPage = () => {
         updateSkillTreeUI();
     }
 };
+export function openSkillTree() {
+    updateSkillTreeUI();
+    document.getElementById('skill-tree-ui').style.display = 'block';
+}
 
+export function closeSkillTree() {
+    document.getElementById('skill-tree-ui').style.display = 'none';
+}
 // Adding event listeners for page navigation
 document.getElementById('next-page').addEventListener('click', nextPage);
 document.getElementById('prev-page').addEventListener('click', prevPage);
@@ -187,5 +202,115 @@ document.getElementById('prev-page').addEventListener('click', prevPage);
 // Initialize skill tree UI
 updateSkillTreeUI();
 
+export function formatSkillName(skillName) {
+    return skillName
+        .split(/(?=[A-Z])/) // Split at uppercase letters
+        .join(' ')          // Join with a space
+        .replace(/\b\w/g, char => char.toUpperCase()); // Capitalize the first letter of each word
+}
+
+window.applySkillEffect = function (skillName) {
+    switch (skillName) {
+        case 'doubleJump':
+            slime.maxJumps = 2;
+            break;
+        case 'fireballShot':
+            slime.fireballDamage = 15;
+            break;
+        case 'fluderJump':
+            canFluderJump = true;
+            fludderJump();
+            break;
+        case 'healthBoost':
+            slime.maxHp *= 1.5;
+            slime.hp = slime.maxHp; // Restore health to max
+            break;
+        case 'speedBoost':
+            slime.acceleration *= 1.5;
+            slime.maxSpeed *= 1.5;
+            break;
+        case 'shieldBlock':
+            activateShield();
+            break;
+        case 'speedDash':
+            activateSpeedDash();
+            break;
+        case 'healthRegeneration':
+            startHealthRegeneration();
+            break;
+        case 'areaAttack':
+            performAreaAttack();
+            break;
+        case 'wallClimb':
+            activateWallClimb();
+            break;
+        default:
+            console.log(`Skill "${skillName}" not recognized.`);
+    }
+};
+
+
+export function activateShield() {
+    slime.isShielded = true;
+    setTimeout(() => slime.isShielded = false, 3000);
+}
+
+export function activateSpeedDash() {
+    slime.maxSpeed *= 2;
+    setTimeout(() => slime.maxSpeed /= 2, 500);
+}
+
+export function startHealthRegeneration() {
+    const regenInterval = setInterval(() => {
+        if (slime.hp < slime.maxHp) {
+            slime.hp = Math.min(slime.maxHp, slime.hp + 2);
+            updateHpBar();
+        } else {
+            clearInterval(regenInterval);
+        }
+    }, 2000);
+}
+
+export function performAreaAttack() {
+    // Logic for damaging nearby enemies (like NPC)
+    if (checkCollision(slime, npc)) {
+        npc.hp -= 30; // Example damage
+        console.log('Area attack hit the NPC!');
+    }
+}
+
+export function activateWallClimb() {
+    // Implement wall climb logic
+    slime.canClimb = true;
+    setTimeout(() => slime.canClimb = false, 5000);
+}
+
+export function fludderJump() {
+    // Adjust this part in your handleInput or main game loop
+    if (canFluderJump && !stopTheControl) {
+      window.addEventListener('keydown', (e) => {
+          if (e.key === 'f' && slime.jumps < slime.maxJumps) {
+              slime.velocityY = -slime.jumpStrength; // Apply an upward force for the fluder jump
+              
+              // Temporarily increase the jump strength
+              const originalGravity = slime.gravity; // Store the original gravity
+              slime.gravity = originalGravity * 0.3; // Make gravity half as strong for a brief moment
+  
+              setTimeout(() => {
+                  slime.gravity = originalGravity; // Revert to the original gravity
+              }, 400); // Shorter duration for the boost
+              
+              slime.jumps++; // Increment jumps to track the fluder jump
+          }
+      });
+      } else {
+  
+      }
+  
+  
+  
+  }
+  
 // Export relevant variables for access in other modules
 export { currentLevel, currentXP, xpToNextLevel };
+
